@@ -153,7 +153,7 @@ func (c *WSClient) sendMessage(msg *protocol.Message) error {
 // SendClipboard отправляет обновление буфера обмена
 func (c *WSClient) SendClipboard(content string) {
 	msg := protocol.NewMessage(protocol.TypeClipboardUpdate, c.clientID, content)
-	
+
 	select {
 	case c.sendChan <- msg:
 		log.Printf("Sending clipboard update (hash: %s, size: %d bytes)", msg.Hash[:8], len(content))

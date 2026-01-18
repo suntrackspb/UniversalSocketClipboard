@@ -51,12 +51,12 @@ func NewMessage(msgType MessageType, clientID string, content string) *Message {
 		ClientID:  clientID,
 		Timestamp: time.Now().Unix(),
 	}
-	
+
 	// Вычисляем хеш для дедупликации
 	if content != "" {
 		msg.Hash = ComputeHash(content)
 	}
-	
+
 	return msg
 }
 

@@ -39,8 +39,8 @@ type Hub struct {
 
 // BroadcastMessage содержит сообщение и исключения
 type BroadcastMessage struct {
-	Message    *protocol.Message
-	ExcludeID  string // ID клиента, которого нужно исключить из broadcast
+	Message   *protocol.Message
+	ExcludeID string // ID клиента, которого нужно исключить из broadcast
 }
 
 // NewHub создает новый Hub
@@ -59,7 +59,7 @@ func (h *Hub) Run() {
 		select {
 		case client := <-h.register:
 			h.mu.Lock()
-			
+
 			// Проверяем лимит клиентов
 			if len(h.clients) >= protocol.MaxClients {
 				log.Printf("Max clients reached (%d), rejecting client %s", protocol.MaxClients, client.ID)
@@ -67,10 +67,10 @@ func (h *Hub) Run() {
 				h.mu.Unlock()
 				continue
 			}
-			
+
 			h.clients[client] = true
 			log.Printf("Client registered: %s (total: %d)", client.ID, len(h.clients))
-			
+
 			// Отправляем текущее состояние буфера новому клиенту
 			if h.lastClipboard != nil {
 				msg, err := h.lastClipboard.ToJSON()
@@ -82,7 +82,7 @@ func (h *Hub) Run() {
 					}
 				}
 			}
-			
+
 			h.mu.Unlock()
 
 		case client := <-h.unregister:
@@ -96,12 +96,12 @@ func (h *Hub) Run() {
 
 		case broadcastMsg := <-h.broadcast:
 			h.mu.Lock()
-			
+
 			// Обновляем последнее состояние буфера
 			if broadcastMsg.Message.Type == protocol.TypeClipboardUpdate {
 				h.lastClipboard = broadcastMsg.Message
 			}
-			
+
 			// Сериализуем сообщение один раз
 			message, err := broadcastMsg.Message.ToJSON()
 			if err != nil {
@@ -109,19 +109,19 @@ func (h *Hub) Run() {
 				h.mu.Unlock()
 				continue
 			}
-			
+
 			// Отправляем всем клиентам кроме отправителя
 			for client := range h.clients {
 				// Пропускаем клиента-отправителя
 				if client.ID == broadcastMsg.ExcludeID {
 					continue
 				}
-				
+
 				// Проверяем дедупликацию
 				if broadcastMsg.Message.Hash != "" && client.LastHash == broadcastMsg.Message.Hash {
 					continue
 				}
-				
+
 				select {
 				case client.Send <- message:
 					// Обновляем последний хеш клиента
@@ -135,7 +135,7 @@ func (h *Hub) Run() {
 					delete(h.clients, client)
 				}
 			}
-			
+
 			h.mu.Unlock()
 		}
 	}

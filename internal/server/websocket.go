@@ -33,7 +33,7 @@ func HandleWebSocket(hub *Hub, w http.ResponseWriter, r *http.Request) {
 
 	// Генерируем ID клиента (можно использовать UUID)
 	clientID := generateClientID(r.RemoteAddr)
-	
+
 	client := &Client{
 		ID:   clientID,
 		Hub:  hub,
@@ -97,18 +97,18 @@ func (c *Client) readPump() {
 		// Обрабатываем сообщение в зависимости от типа
 		switch msg.Type {
 		case protocol.TypeClipboardUpdate:
-			log.Printf("Clipboard update from client %s (hash: %s, size: %d bytes)", 
+			log.Printf("Clipboard update from client %s (hash: %s, size: %d bytes)",
 				c.ID, msg.Hash[:8], len(msg.Content))
-			
+
 			// Проверяем дедупликацию
 			if msg.Hash != "" && c.LastHash == msg.Hash {
 				log.Printf("Duplicate clipboard update from client %s, ignoring", c.ID)
 				continue
 			}
-			
+
 			// Обновляем хеш клиента
 			c.LastHash = msg.Hash
-			
+
 			// Рассылаем обновление всем остальным клиентам
 			c.Hub.Broadcast(msg, c.ID)
 

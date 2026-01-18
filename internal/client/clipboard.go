@@ -9,18 +9,18 @@ import (
 
 // ClipboardMonitor отслеживает изменения буфера обмена
 type ClipboardMonitor struct {
-	lastHash    string
-	onChange    func(content string)
+	lastHash     string
+	onChange     func(content string)
 	pollInterval time.Duration
-	stopChan    chan struct{}
+	stopChan     chan struct{}
 }
 
 // NewClipboardMonitor создает новый монитор буфера обмена
 func NewClipboardMonitor(onChange func(content string)) *ClipboardMonitor {
 	return &ClipboardMonitor{
-		onChange:    onChange,
+		onChange:     onChange,
 		pollInterval: 500 * time.Millisecond,
-		stopChan:    make(chan struct{}),
+		stopChan:     make(chan struct{}),
 	}
 }
 
@@ -67,15 +67,15 @@ func (m *ClipboardMonitor) checkClipboard() {
 	}
 
 	text := string(content)
-	
+
 	// Вычисляем хеш
 	hash := computeHash(text)
-	
+
 	// Проверяем изменения
 	if hash != m.lastHash {
 		m.lastHash = hash
 		log.Printf("Local clipboard changed (hash: %s, size: %d bytes)", hash[:8], len(text))
-		
+
 		// Вызываем коллбек
 		if m.onChange != nil {
 			m.onChange(text)
@@ -95,10 +95,10 @@ func (m *ClipboardMonitor) updateLastHash() {
 func (m *ClipboardMonitor) SetClipboard(text string) error {
 	// Обновляем хеш перед установкой, чтобы избежать петли
 	m.lastHash = computeHash(text)
-	
+
 	clipboard.Write(clipboard.FmtText, []byte(text))
 	log.Printf("Clipboard updated from server (size: %d bytes)", len(text))
-	
+
 	return nil
 }
 
@@ -122,13 +122,13 @@ func hashString(s string) string {
 		offset64 = 14695981039346656037
 		prime64  = 1099511628211
 	)
-	
+
 	hash := uint64(offset64)
 	for i := 0; i < len(s); i++ {
 		hash ^= uint64(s[i])
 		hash *= prime64
 	}
-	
+
 	// Преобразуем в строку
 	return string(rune(hash))
 }
