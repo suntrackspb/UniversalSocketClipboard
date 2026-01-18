@@ -238,7 +238,7 @@ func (m *ClipboardMonitor) SetClipboard(content string) error {
 			return err
 		}
 		log.Printf("📁 File saved to temp: %s (%d bytes)", savedPath, len(fileContent))
-		
+
 		// Копируем файл в буфер обмена
 		// На macOS используем pbcopy для правильного формата файлов
 		if err := copyFileToClipboard(savedPath); err != nil {
@@ -250,7 +250,7 @@ func (m *ClipboardMonitor) SetClipboard(content string) error {
 				goclipboard.WriteAll(savedPath)
 			}
 		}
-		
+
 		// Обновляем кэш чтобы не читать файл снова
 		m.lastFilePath = savedPath
 		m.lastHash = computeHash("FILE_PATH:" + savedPath)
@@ -299,16 +299,16 @@ func saveReceivedFile(originalPath string, content []byte) (string, error) {
 	// Всегда сохраняем во временную директорию
 	// Это позволяет вставлять файл куда нужно через буфер обмена
 	tmpDir := os.TempDir()
-	
+
 	// Создаем уникальное имя чтобы не конфликтовать с другими файлами
 	timestamp := time.Now().Unix()
 	savePath := fmt.Sprintf("%s/clipboard_%d_%s", tmpDir, timestamp, fileName)
-	
+
 	err := os.WriteFile(savePath, content, 0644)
 	if err != nil {
 		return "", err
 	}
-	
+
 	// На macOS/Linux файл в буфере обмена - это путь к файлу
 	// Когда пользователь вставляет его, система копирует файл в новое место
 	// Поэтому сохраняем во временную директорию - файл будет доступен для вставки
