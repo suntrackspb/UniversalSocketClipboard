@@ -54,7 +54,7 @@ server-openwrt: deps
 client-windows: deps
 	@echo "$(YELLOW)Компиляция клиента для Windows (x64)...$(NC)"
 	@mkdir -p $(BIN_DIR)
-	GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build \
+	GOOS=windows GOARCH=amd64 go build \
 		-ldflags="$(LDFLAGS) -H=windowsgui" \
 		-trimpath \
 		-o $(BIN_DIR)/clipboard-client-windows.exe \
@@ -66,7 +66,7 @@ client-windows: deps
 client-linux: deps
 	@echo "$(YELLOW)Компиляция клиента для Linux (x64)...$(NC)"
 	@mkdir -p $(BIN_DIR)
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build \
+	GOOS=linux GOARCH=amd64 go build \
 		-ldflags="$(LDFLAGS)" \
 		-trimpath \
 		-o $(BIN_DIR)/clipboard-client-linux \
@@ -78,7 +78,7 @@ client-linux: deps
 client-macos: deps
 	@echo "$(YELLOW)Компиляция клиента для macOS (ARM64)...$(NC)"
 	@mkdir -p $(BIN_DIR)
-	GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build \
+	GOOS=darwin GOARCH=arm64 go build \
 		-ldflags="$(LDFLAGS)" \
 		-trimpath \
 		-o $(BIN_DIR)/clipboard-client-macos \
@@ -92,14 +92,14 @@ client-macos-universal: deps
 	@mkdir -p $(BIN_DIR)
 	
 	@echo "  - Сборка ARM64..."
-	@GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build \
+	@GOOS=darwin GOARCH=arm64 go build \
 		-ldflags="$(LDFLAGS)" \
 		-trimpath \
 		-o $(BIN_DIR)/clipboard-client-macos-arm64 \
 		./$(CMD_CLIENT)
 	
 	@echo "  - Сборка AMD64..."
-	@GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build \
+	@GOOS=darwin GOARCH=amd64 go build \
 		-ldflags="$(LDFLAGS)" \
 		-trimpath \
 		-o $(BIN_DIR)/clipboard-client-macos-amd64 \

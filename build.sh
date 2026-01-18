@@ -37,7 +37,7 @@ echo ""
 
 # Клиент для Windows
 echo "🔨 Компиляция клиента для Windows (x64)..."
-GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build \
+GOOS=windows GOARCH=amd64 go build \
     -ldflags="-s -w -H=windowsgui" \
     -trimpath \
     -o bin/clipboard-client-windows.exe \
@@ -47,7 +47,7 @@ echo ""
 
 # Клиент для Linux
 echo "🔨 Компиляция клиента для Linux (x64)..."
-GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build \
+GOOS=linux GOARCH=amd64 go build \
     -ldflags="-s -w" \
     -trimpath \
     -o bin/clipboard-client-linux \
@@ -57,7 +57,7 @@ echo ""
 
 # Клиент для macOS
 echo "🔨 Компиляция клиента для macOS (ARM64)..."
-GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build \
+GOOS=darwin GOARCH=arm64 go build \
     -ldflags="-s -w" \
     -trimpath \
     -o bin/clipboard-client-macos \

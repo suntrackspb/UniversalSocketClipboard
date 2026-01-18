@@ -64,16 +64,16 @@ jobs:
           GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -o /tmp/server-openwrt ./cmd/server
           
           echo "Testing Windows build..."
-          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o /tmp/client-windows.exe ./cmd/client
+          GOOS=windows GOARCH=amd64 go build -o /tmp/client-windows.exe ./cmd/client
           
           echo "Testing Linux build..."
-          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /tmp/client-linux ./cmd/client
+          GOOS=linux GOARCH=amd64 go build -o /tmp/client-linux ./cmd/client
           
           echo "Testing macOS ARM64 build..."
-          GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -o /tmp/client-macos-arm64 ./cmd/client
+          GOOS=darwin GOARCH=arm64 go build -o /tmp/client-macos-arm64 ./cmd/client
           
           echo "Testing macOS AMD64 build..."
-          GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -o /tmp/client-macos-amd64 ./cmd/client
+          GOOS=darwin GOARCH=amd64 go build -o /tmp/client-macos-amd64 ./cmd/client
           
           echo "✅ All platforms build successfully!"
 

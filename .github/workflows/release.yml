@@ -60,7 +60,7 @@ jobs:
           
       - name: Build Client (Windows x64)
         run: |
-          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build \
+          GOOS=windows GOARCH=amd64 go build \
             -ldflags="-s -w -H=windowsgui -X main.version=${{ steps.version.outputs.VERSION }}" \
             -trimpath \
             -o bin/clipboard-client-windows.exe \
@@ -68,7 +68,7 @@ jobs:
 
       - name: Build Client (Linux x64)
         run: |
-          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build \
+          GOOS=linux GOARCH=amd64 go build \
             -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" \
             -trimpath \
             -o bin/clipboard-client-linux \
@@ -76,7 +76,7 @@ jobs:
 
       - name: Build Client (macOS ARM64)
         run: |
-          GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build \
+          GOOS=darwin GOARCH=arm64 go build \
             -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" \
             -trimpath \
             -o bin/clipboard-client-macos-arm64 \
@@ -84,7 +84,7 @@ jobs:
 
       - name: Build Client (macOS x64)
         run: |
-          GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build \
+          GOOS=darwin GOARCH=amd64 go build \
             -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" \
             -trimpath \
             -o bin/clipboard-client-macos-amd64 \
