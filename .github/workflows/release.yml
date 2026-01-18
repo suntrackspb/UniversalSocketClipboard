@@ -74,21 +74,7 @@ jobs:
             -o bin/clipboard-client-linux \
             ./cmd/client
 
-      - name: Build Client (macOS ARM64)
-        run: |
-          GOOS=darwin GOARCH=arm64 go build \
-            -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" \
-            -trimpath \
-            -o bin/clipboard-client-macos-arm64 \
-            ./cmd/client
-
-      - name: Build Client (macOS x64)
-        run: |
-          GOOS=darwin GOARCH=amd64 go build \
-            -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" \
-            -trimpath \
-            -o bin/clipboard-client-macos-amd64 \
-            ./cmd/client
+      # macOS клиенты собираются в отдельном job на macOS runner
 
       - name: Create macOS Universal Binary
         run: |
@@ -132,20 +118,79 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: binaries
+          name: binaries-linux
           path: |
             bin/clipboard-server-openwrt
             bin/clipboard-client-windows.exe
             bin/clipboard-client-linux
-            bin/clipboard-client-macos-arm64
-            bin/clipboard-client-macos-amd64
             bin/checksums.txt
             bin/*.tar.gz
             bin/*.zip
 
+  build-macos:
+    name: Build macOS clients
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Get dependencies
+        run: |
+          rm -f go.sum
+          go mod download
+          go mod tidy
+
+      - name: Set version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/}"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building version: $VERSION"
+
+      - name: Build Client (macOS ARM64)
+        run: |
+          GOARCH=arm64 go build \
+            -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" \
+            -trimpath \
+            -o bin/clipboard-client-macos-arm64 \
+            ./cmd/client
+
+      - name: Build Client (macOS x64)
+        run: |
+          GOARCH=amd64 go build \
+            -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" \
+            -trimpath \
+            -o bin/clipboard-client-macos-amd64 \
+            ./cmd/client
+
+      - name: Create macOS archives
+        run: |
+          cd bin
+          tar -czf clipboard-client-macos-arm64-${{ steps.version.outputs.VERSION }}.tar.gz clipboard-client-macos-arm64
+          tar -czf clipboard-client-macos-amd64-${{ steps.version.outputs.VERSION }}.tar.gz clipboard-client-macos-amd64
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-macos
+          path: |
+            bin/clipboard-client-macos-arm64
+            bin/clipboard-client-macos-amd64
+            bin/*.tar.gz
+
   release:
     name: Create Release
-    needs: build
+    needs: [build, build-macos]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
     
@@ -153,10 +198,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download artifacts
+      - name: Download Linux artifacts
         uses: actions/download-artifact@v4
         with:
-          name: binaries
+          name: binaries-linux
+          path: bin/
+
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: binaries-macos
           path: bin/
 
       - name: Set version
