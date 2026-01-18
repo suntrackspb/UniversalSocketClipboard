@@ -135,4 +135,3 @@ func computeHash(data string) string {
 	// Преобразуем в hex строку
 	return fmt.Sprintf("%016x", hash)
 }
-
