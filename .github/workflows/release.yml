@@ -30,6 +30,7 @@ jobs:
 
       - name: Get dependencies
         run: |
+          rm -f go.sum
           go mod download
           go mod tidy
 

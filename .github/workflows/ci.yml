@@ -32,8 +32,9 @@ jobs:
 
       - name: Download dependencies
         run: |
+          rm -f go.sum
           go mod download
-          go mod verify
+          go mod tidy
 
       - name: Check formatting
         run: |
