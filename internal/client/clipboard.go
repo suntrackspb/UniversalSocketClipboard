@@ -86,7 +86,7 @@ func (m *ClipboardMonitor) checkClipboard() {
 	if m.useAdvanced {
 		// Используем golang.design/clipboard
 		// Приоритет: Изображение > Файлы > Текст
-		
+
 		// 1. Проверяем изображение
 		imgData := clipboard.Read(clipboard.FmtImage)
 		if len(imgData) > 0 {
@@ -97,7 +97,7 @@ func (m *ClipboardMonitor) checkClipboard() {
 			textData := clipboard.Read(clipboard.FmtText)
 			if len(textData) > 0 {
 				text := string(textData)
-				
+
 				// Проверяем это путь к файлу?
 				if isFilePath(text) {
 					// Пытаемся найти полный путь
@@ -108,9 +108,9 @@ func (m *ClipboardMonitor) checkClipboard() {
 							// Тот же файл, пропускаем (избегаем повторного чтения)
 							return
 						}
-						
+
 						m.lastFilePath = fullPath
-						
+
 						// Это файл! Читаем содержимое и кодируем
 						fileContent, err := readFileContent(fullPath)
 						if err == nil {
@@ -281,13 +281,13 @@ func saveReceivedFile(originalPath string, content []byte) (string, error) {
 		parts := strings.Split(fileName, "/")
 		fileName = parts[len(parts)-1]
 	}
-	
+
 	// Сохраняем в Downloads или временную директорию
 	downloadsDir := os.Getenv("HOME") + "/Downloads"
 	if _, err := os.Stat(downloadsDir); os.IsNotExist(err) {
 		downloadsDir = os.TempDir()
 	}
-	
+
 	savePath := downloadsDir + "/clipboard_" + fileName
 	err := os.WriteFile(savePath, content, 0644)
 	return savePath, err
@@ -328,14 +328,14 @@ func isFilePath(text string) bool {
 		info, err := os.Stat(path)
 		return err == nil && !info.IsDir()
 	}
-	
+
 	// На macOS при копировании файла может быть только имя файла
 	// Проверяем что это похоже на имя файла (есть расширение)
 	if strings.Contains(text, ".") && !strings.Contains(text, " ") {
 		// Может быть имя файла, попробуем найти в стандартных местах
 		return tryFindFile(text)
 	}
-	
+
 	return false
 }
 
@@ -353,7 +353,7 @@ func findFullPath(fileName string) string {
 		}
 		return ""
 	}
-	
+
 	// Ищем в стандартных директориях
 	home := os.Getenv("HOME")
 	searchDirs := []string{
@@ -362,7 +362,7 @@ func findFullPath(fileName string) string {
 		home + "/Documents",
 		home + "/Pictures",
 	}
-	
+
 	for _, dir := range searchDirs {
 		path := dir + "/" + fileName
 		if info, err := os.Stat(path); err == nil && !info.IsDir() {
@@ -379,7 +379,7 @@ func readFileContent(filePath string) ([]byte, error) {
 	if strings.HasPrefix(path, "file://") {
 		path = strings.TrimPrefix(path, "file://")
 	}
-	
+
 	// Ограничиваем размер файла (например, 10MB)
 	info, err := os.Stat(path)
 	if err != nil {
@@ -388,7 +388,7 @@ func readFileContent(filePath string) ([]byte, error) {
 	if info.Size() > 10*1024*1024 {
 		return nil, fmt.Errorf("file too large: %d bytes", info.Size())
 	}
-	
+
 	return os.ReadFile(path)
 }
 
@@ -406,13 +406,13 @@ func decodeFile(encoded string) (string, []byte, error) {
 	if len(encoded) < len(prefix) || encoded[:len(prefix)] != prefix {
 		return "", nil, fmt.Errorf("not a file")
 	}
-	
+
 	data := encoded[len(prefix):]
 	parts := strings.SplitN(data, "|", 2)
 	if len(parts) != 2 {
 		return "", nil, fmt.Errorf("invalid file format")
 	}
-	
+
 	filePath := parts[0]
 	fileContent, err := base64.StdEncoding.DecodeString(parts[1])
 	return filePath, fileContent, err
