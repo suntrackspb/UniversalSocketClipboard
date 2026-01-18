@@ -109,10 +109,6 @@ jobs:
           # Linux
           tar -czf clipboard-client-linux-${{ steps.version.outputs.VERSION }}.tar.gz clipboard-client-linux
           
-          # macOS
-          tar -czf clipboard-client-macos-arm64-${{ steps.version.outputs.VERSION }}.tar.gz clipboard-client-macos-arm64
-          tar -czf clipboard-client-macos-amd64-${{ steps.version.outputs.VERSION }}.tar.gz clipboard-client-macos-amd64
-          
           ls -lh *.tar.gz *.zip
 
       - name: Upload artifacts
