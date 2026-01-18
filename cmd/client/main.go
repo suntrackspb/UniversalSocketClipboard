@@ -16,13 +16,13 @@ import (
 var (
 	serverURL = flag.String("server", "ws://192.168.1.1:8080/ws", "WebSocket server URL")
 	clientID  = flag.String("id", "", "Client ID (auto-generated if empty)")
-	version   = "1.0.0"
+	version   = "dev" // Будет заменено при сборке через -ldflags
 )
 
 func main() {
 	flag.Parse()
 
-	log.Printf("OpenWRT Clipboard Client v%s", version)
+	log.Printf("OpenWRT Clipboard Client %s", version)
 
 	// Генерируем Client ID если не указан
 	if *clientID == "" {

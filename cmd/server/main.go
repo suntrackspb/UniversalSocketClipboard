@@ -15,13 +15,13 @@ import (
 
 var (
 	addr    = flag.String("addr", ":8080", "HTTP server address")
-	version = "1.0.0"
+	version = "dev" // Будет заменено при сборке через -ldflags
 )
 
 func main() {
 	flag.Parse()
 
-	log.Printf("OpenWRT Clipboard Server v%s", version)
+	log.Printf("OpenWRT Clipboard Server %s", version)
 	log.Printf("Starting server on %s", *addr)
 
 	// Создаем Hub
