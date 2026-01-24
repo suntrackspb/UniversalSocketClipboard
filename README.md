@@ -23,10 +23,10 @@
 
 ```bash
 # Windows
-clipboard-client-windows.exe -server ws://192.168.1.1:8080/ws
+clipboard-client-windows.exe -server ws://192.168.1.1:9090/ws
 
 # Linux / macOS
-clipboard-client -server ws://192.168.1.1:8080/ws
+clipboard-client -server ws://192.168.1.1:9090/ws
 ```
 
 ## Сборка

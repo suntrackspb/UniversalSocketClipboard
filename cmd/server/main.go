@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	addr    = flag.String("addr", ":8080", "HTTP server address")
+	addr    = flag.String("addr", ":9090", "HTTP server address")
 	version = "dev" // Будет заменено при сборке через -ldflags
 )
 

@@ -262,7 +262,7 @@ jobs:
           # Запустить на роутере
           ssh root@192.168.1.1
           chmod +x /tmp/clipboard-server
-          /tmp/clipboard-server -addr :8080
+          /tmp/clipboard-server -addr :9090
           ```
           
           ### 2. Установка клиента
@@ -270,7 +270,7 @@ jobs:
           #### Windows
           ```cmd
           # Распаковать ZIP
-          # Запустить: clipboard-client-windows.exe -server ws://192.168.1.1:8080/ws
+          # Запустить: clipboard-client-windows.exe -server ws://192.168.1.1:9090/ws
           ```
           
           #### Linux
@@ -278,7 +278,7 @@ jobs:
           tar -xzf clipboard-client-linux-${{ steps.version.outputs.VERSION }}.tar.gz
           sudo mv clipboard-client-linux /usr/local/bin/clipboard-client
           sudo chmod +x /usr/local/bin/clipboard-client
-          clipboard-client -server ws://192.168.1.1:8080/ws
+          clipboard-client -server ws://192.168.1.1:9090/ws
           ```
           
           #### macOS
@@ -292,7 +292,7 @@ jobs:
           sudo mv clipboard-client-macos-amd64 /usr/local/bin/clipboard-client
           
           sudo chmod +x /usr/local/bin/clipboard-client
-          clipboard-client -server ws://192.168.1.1:8080/ws
+          clipboard-client -server ws://192.168.1.1:9090/ws
           ```
           
           ## 📚 Документация

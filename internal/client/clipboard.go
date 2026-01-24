@@ -16,20 +16,24 @@ type ClipboardMonitor struct {
 	onChange     func(content string)
 	pollInterval time.Duration
 	stopChan     chan struct{}
+	debug        bool
 }
 
 // NewClipboardMonitor создает новый монитор буфера обмена
-func NewClipboardMonitor(onChange func(content string)) *ClipboardMonitor {
+func NewClipboardMonitor(debug bool, onChange func(content string)) *ClipboardMonitor {
 	return &ClipboardMonitor{
 		onChange:     onChange,
 		pollInterval: 500 * time.Millisecond,
 		stopChan:     make(chan struct{}),
+		debug:        debug,
 	}
 }
 
 // Start запускает мониторинг буфера обмена
 func (m *ClipboardMonitor) Start() error {
-	log.Printf("Clipboard monitor started, polling every %v", m.pollInterval)
+	if m.debug {
+		log.Printf("Clipboard monitor started, polling every %v", m.pollInterval)
+	}
 
 	// Получаем текущее содержимое
 	m.updateLastHash()
@@ -66,7 +70,9 @@ func (m *ClipboardMonitor) monitorLoop() {
 func (m *ClipboardMonitor) checkClipboard() {
 	content, err := goclipboard.ReadAll()
 	if err != nil {
-		log.Printf("Failed to read clipboard: %v", err)
+		if m.debug {
+			log.Printf("Failed to read clipboard: %v", err)
+		}
 		return
 	}
 	if len(content) == 0 {
@@ -84,7 +90,9 @@ func (m *ClipboardMonitor) checkClipboard() {
 	// Проверяем изменения
 	if hash != m.lastHash {
 		m.lastHash = hash
-		log.Printf("Local clipboard changed (hash: %s, size: %d bytes)", hash[:min(8, len(hash))], len(content))
+		if m.debug {
+			log.Printf("Local clipboard changed (hash: %s, size: %d bytes)", hash[:min(8, len(hash))], len(content))
+		}
 
 		// Вызываем коллбек
 		if m.onChange != nil {
@@ -116,10 +124,14 @@ func (m *ClipboardMonitor) SetClipboard(content string) error {
 	// Обновляем хеш перед установкой, чтобы избежать петли
 	m.lastHash = computeHash(content)
 
-	log.Printf("Clipboard updated from server (size: %d bytes)", len(content))
+	if m.debug {
+		log.Printf("Clipboard updated from server (size: %d bytes)", len(content))
+	}
 	err := goclipboard.WriteAll(content)
 	if err != nil {
-		log.Printf("Failed to write clipboard: %v", err)
+		if m.debug {
+			log.Printf("Failed to write clipboard: %v", err)
+		}
 		return err
 	}
 
@@ -129,7 +141,9 @@ func (m *ClipboardMonitor) SetClipboard(content string) error {
 // Stop останавливает мониторинг
 func (m *ClipboardMonitor) Stop() {
 	close(m.stopChan)
-	log.Printf("Clipboard monitor stopped")
+	if m.debug {
+		log.Printf("Clipboard monitor stopped")
+	}
 }
 
 // isFilePath проверяет является ли строка путем к файлу

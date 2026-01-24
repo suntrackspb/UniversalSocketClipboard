@@ -17,15 +17,17 @@ type WSClient struct {
 	sendChan     chan *protocol.Message
 	receiveChan  chan *protocol.Message
 	reconnecting bool
+	debug        bool
 }
 
 // NewWSClient создает нового WebSocket клиента
-func NewWSClient(serverURL, clientID string) *WSClient {
+func NewWSClient(serverURL, clientID string, debug bool) *WSClient {
 	return &WSClient{
 		serverURL:   serverURL,
 		clientID:    clientID,
 		sendChan:    make(chan *protocol.Message, 10),
 		receiveChan: make(chan *protocol.Message, 10),
+		debug:       debug,
 	}
 }
 
@@ -36,19 +38,23 @@ func (c *WSClient) Connect() error {
 		return err
 	}
 
-	log.Printf("Connecting to %s", u.String())
-
+	// Попытка подключения
+	if c.debug {
+		log.Printf("Connecting to %s", u.String())
+	}
 	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
 		return err
 	}
 
 	c.conn = conn
-	log.Printf("Connected to server")
+	if c.debug {
+		log.Printf("Connected to server")
+	}
 
 	// Отправляем приветствие
 	helloMsg := protocol.NewMessage(protocol.TypeClientHello, c.clientID, "")
-	if err := c.sendMessage(helloMsg); err != nil {
+	if err := c.sendMessage(helloMsg); err != nil && c.debug {
 		log.Printf("Failed to send hello: %v", err)
 	}
 
@@ -78,7 +84,7 @@ func (c *WSClient) readPump() {
 
 		_, messageData, err := c.conn.ReadMessage()
 		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+			if c.debug && websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("WebSocket read error: %v", err)
 			}
 			c.handleDisconnect()
@@ -87,7 +93,9 @@ func (c *WSClient) readPump() {
 
 		msg, err := protocol.FromJSON(messageData)
 		if err != nil {
-			log.Printf("Failed to parse message: %v", err)
+			if c.debug {
+				log.Printf("Failed to parse message: %v", err)
+			}
 			continue
 		}
 
@@ -95,7 +103,9 @@ func (c *WSClient) readPump() {
 		select {
 		case c.receiveChan <- msg:
 		default:
-			log.Printf("Receive channel full, dropping message")
+			if c.debug {
+				log.Printf("Receive channel full, dropping message")
+			}
 		}
 	}
 }
@@ -114,12 +124,16 @@ func (c *WSClient) writePump() {
 		select {
 		case msg := <-c.sendChan:
 			if c.conn == nil {
-				log.Printf("Not connected, cannot send message")
+				if c.debug {
+					log.Printf("Not connected, cannot send message")
+				}
 				continue
 			}
 
 			if err := c.sendMessage(msg); err != nil {
-				log.Printf("Send error: %v", err)
+				if c.debug {
+					log.Printf("Send error: %v", err)
+				}
 				c.handleDisconnect()
 				return
 			}
@@ -131,7 +145,9 @@ func (c *WSClient) writePump() {
 
 			c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-				log.Printf("Ping error: %v", err)
+				if c.debug {
+					log.Printf("Ping error: %v", err)
+				}
 				c.handleDisconnect()
 				return
 			}
@@ -156,9 +172,13 @@ func (c *WSClient) SendClipboard(content string) {
 
 	select {
 	case c.sendChan <- msg:
-		log.Printf("Sending clipboard update (hash: %s, size: %d bytes)", msg.Hash[:8], len(content))
+		if c.debug {
+			log.Printf("Sending clipboard update (hash: %s, size: %d bytes)", msg.Hash[:8], len(content))
+		}
 	default:
-		log.Printf("Send channel full, dropping clipboard update")
+		if c.debug {
+			log.Printf("Send channel full, dropping clipboard update")
+		}
 	}
 }
 
@@ -168,6 +188,7 @@ func (c *WSClient) ReceiveChan() <-chan *protocol.Message {
 }
 
 // handleDisconnect обрабатывает разрыв соединения
+// Бесконечно пытается переподключиться
 func (c *WSClient) handleDisconnect() {
 	if c.reconnecting {
 		return
@@ -176,21 +197,29 @@ func (c *WSClient) handleDisconnect() {
 	c.reconnecting = true
 	c.conn = nil
 
-	log.Printf("Disconnected from server, attempting to reconnect...")
+	if c.debug {
+		log.Printf("Disconnected from server, attempting to reconnect...")
+	}
 
-	// Пытаемся переподключиться
+	// Пытаемся переподключиться в фоне
 	go func() {
 		for {
 			time.Sleep(5 * time.Second)
 
-			log.Printf("Reconnecting...")
+			if c.debug {
+				log.Printf("Reconnecting...")
+			}
 			if err := c.Connect(); err != nil {
-				log.Printf("Reconnect failed: %v", err)
+				if c.debug {
+					log.Printf("Reconnect failed: %v", err)
+				}
 				continue
 			}
 
 			c.reconnecting = false
-			log.Printf("Reconnected successfully")
+			if c.debug {
+				log.Printf("Reconnected successfully")
+			}
 			return
 		}
 	}()

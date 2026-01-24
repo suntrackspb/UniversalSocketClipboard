@@ -5,7 +5,7 @@
 # Конфигурация (можно переопределить через переменные окружения)
 ROUTER_IP="${ROUTER_IP:-192.168.1.1}"
 ROUTER_USER="${ROUTER_USER:-root}"
-ROUTER_PORT="${ROUTER_PORT:-8080}"
+ROUTER_PORT="${ROUTER_PORT:-9090}"
 SERVER_BIN="bin/clipboard-server-openwrt"
 
 echo "🚀 OpenWRT Clipboard - Развертывание на роутере"

@@ -163,4 +163,4 @@ run-server: local-server
 # Запуск клиента локально для тестирования
 run-client: local-client
 	@echo "$(YELLOW)Запуск клиента локально...$(NC)"
-	@$(BIN_DIR)/clipboard-client -server ws://localhost:8080/ws
+	@$(BIN_DIR)/clipboard-client -server ws://localhost:9090/ws
