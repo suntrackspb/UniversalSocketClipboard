@@ -1,4 +1,4 @@
-# OpenWRT Clipboard
+# Universal Socket Clipboard
 
 ---
 
