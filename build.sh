@@ -25,14 +25,34 @@ echo ""
 # Создаем директорию для бинарников
 mkdir -p bin
 
-# Сервер для OpenWRT
+# Сервер для OpenWRT (ARM64)
 echo "🔨 Компиляция сервера для OpenWRT (ARM64)..."
 GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build \
     -ldflags="-s -w" \
     -trimpath \
     -o bin/clipboard-server-openwrt \
     ./cmd/server
-echo "✓ Сервер: bin/clipboard-server-openwrt ($(du -h bin/clipboard-server-openwrt | cut -f1))"
+echo "✓ Сервер OpenWRT: bin/clipboard-server-openwrt ($(du -h bin/clipboard-server-openwrt | cut -f1))"
+echo ""
+
+# Сервер для Linux (x64)
+echo "🔨 Компиляция сервера для Linux (x64)..."
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build \
+    -ldflags="-s -w" \
+    -trimpath \
+    -o bin/clipboard-server-linux \
+    ./cmd/server
+echo "✓ Сервер Linux: bin/clipboard-server-linux ($(du -h bin/clipboard-server-linux | cut -f1))"
+echo ""
+
+# Сервер для Windows (x64)
+echo "🔨 Компиляция сервера для Windows (x64)..."
+GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build \
+    -ldflags="-s -w" \
+    -trimpath \
+    -o bin/clipboard-server-windows.exe \
+    ./cmd/server
+echo "✓ Сервер Windows: bin/clipboard-server-windows.exe ($(du -h bin/clipboard-server-windows.exe | cut -f1))"
 echo ""
 
 # Клиент для Windows

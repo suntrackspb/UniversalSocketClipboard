@@ -57,7 +57,23 @@ jobs:
             -trimpath \
             -o bin/clipboard-server-openwrt \
             ./cmd/server
-          
+
+      - name: Build Server (Linux x64)
+        run: |
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build \
+            -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" \
+            -trimpath \
+            -o bin/clipboard-server-linux \
+            ./cmd/server
+
+      - name: Build Server (Windows x64)
+        run: |
+          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build \
+            -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" \
+            -trimpath \
+            -o bin/clipboard-server-windows.exe \
+            ./cmd/server
+
       - name: Build Client (Windows x64)
         run: |
           GOOS=windows GOARCH=amd64 go build \
@@ -100,8 +116,10 @@ jobs:
           # Создаем архивы для каждой платформы
           cd bin
           
-          # Server
+          # Servers
           tar -czf clipboard-server-openwrt-${{ steps.version.outputs.VERSION }}.tar.gz clipboard-server-openwrt
+          tar -czf clipboard-server-linux-${{ steps.version.outputs.VERSION }}.tar.gz clipboard-server-linux
+          zip clipboard-server-windows-${{ steps.version.outputs.VERSION }}.zip clipboard-server-windows.exe
           
           # Windows
           zip clipboard-client-windows-${{ steps.version.outputs.VERSION }}.zip clipboard-client-windows.exe
@@ -117,6 +135,8 @@ jobs:
           name: binaries-linux
           path: |
             bin/clipboard-server-openwrt
+            bin/clipboard-server-linux
+            bin/clipboard-server-windows.exe
             bin/clipboard-client-windows.exe
             bin/clipboard-client-linux
             bin/checksums.txt
@@ -230,7 +250,7 @@ jobs:
           
           ## 🎯 Что включено
           
-          - ✅ WebSocket сервер для OpenWRT (ARM64)
+          - ✅ WebSocket серверы для OpenWRT (ARM64), Linux (x64), Windows (x64)
           - ✅ Клиенты для Windows, Linux, macOS
           - ✅ Автоматическая синхронизация буфера обмена
           - ✅ Автоматический реконнект
@@ -238,8 +258,10 @@ jobs:
           
           ## 📦 Файлы для скачивания
           
-          ### Сервер (OpenWRT)
+          ### Серверы
           - `clipboard-server-openwrt-${{ steps.version.outputs.VERSION }}.tar.gz` - для роутера Cudy WR3000S v1 и других ARM64 роутеров
+          - `clipboard-server-linux-${{ steps.version.outputs.VERSION }}.tar.gz` - для Linux (x64): серверы, NAS, хост-машины
+          - `clipboard-server-windows-${{ steps.version.outputs.VERSION }}.zip` - для Windows (x64): серверы и рабочие станции
           
           ### Клиенты
           - `clipboard-client-windows-${{ steps.version.outputs.VERSION }}.zip` - для Windows 10/11 (x64)
@@ -249,7 +271,9 @@ jobs:
           
           ## 🚀 Быстрый старт
           
-          ### 1. Установка сервера на роутер
+          ### 1. Установка сервера
+          
+          #### OpenWRT (роутер)
           
           ```bash
           # Скачать и распаковать
@@ -263,6 +287,22 @@ jobs:
           ssh root@192.168.1.1
           chmod +x /tmp/clipboard-server
           /tmp/clipboard-server -addr :9090
+          ```
+          
+          #### Linux (x64)
+          ```bash
+          wget https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.VERSION }}/clipboard-server-linux-${{ steps.version.outputs.VERSION }}.tar.gz
+          tar -xzf clipboard-server-linux-${{ steps.version.outputs.VERSION }}.tar.gz
+          sudo mv clipboard-server-linux /usr/local/bin/clipboard-server
+          sudo chmod +x /usr/local/bin/clipboard-server
+          clipboard-server -addr :9090
+          ```
+          
+          #### Windows (x64)
+          ```powershell
+          # Скачать и распаковать ZIP
+          # Запустить в PowerShell или cmd:
+          clipboard-server-windows.exe -addr :9090
           ```
           
           ### 2. Установка клиента
@@ -338,6 +378,8 @@ jobs:
           tag_name: ${{ steps.version.outputs.VERSION }}
           files: |
             bin/clipboard-server-openwrt
+            bin/clipboard-server-linux
+            bin/clipboard-server-windows.exe
             bin/clipboard-client-windows.exe
             bin/clipboard-client-linux
             bin/clipboard-client-macos-arm64

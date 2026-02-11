@@ -14,7 +14,7 @@ GREEN := \033[0;32m
 YELLOW := \033[0;33m
 NC := \033[0m
 
-all: deps server-openwrt client-windows client-linux client-macos
+all: deps server-openwrt server-linux server-windows client-windows client-linux client-macos
 	@echo "$(GREEN)✓ Все бинарники скомпилированы успешно!$(NC)"
 
 help:
@@ -24,6 +24,8 @@ help:
 	@echo "  make all                  - Собрать все бинарники"
 	@echo "  make deps                 - Установить зависимости"
 	@echo "  make server-openwrt       - Собрать сервер для OpenWRT (ARM64)"
+	@echo "  make server-linux         - Собрать сервер для Linux (AMD64)"
+	@echo "  make server-windows       - Собрать сервер для Windows (AMD64)"
 	@echo "  make client-windows       - Собрать клиент для Windows"
 	@echo "  make client-linux         - Собрать клиент для Linux"
 	@echo "  make client-macos         - Собрать клиент для macOS (ARM64)"
@@ -49,6 +51,30 @@ server-openwrt: deps
 		./$(CMD_SERVER)
 	@ls -lh $(BIN_DIR)/clipboard-server-openwrt
 	@echo "$(GREEN)✓ Сервер для OpenWRT собран: $(BIN_DIR)/clipboard-server-openwrt$(NC)"
+
+# Сервер для Linux (AMD64)
+server-linux: deps
+	@echo "$(YELLOW)Компиляция сервера для Linux (AMD64)...$(NC)"
+	@mkdir -p $(BIN_DIR)
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build \
+		-ldflags="$(LDFLAGS)" \
+		-trimpath \
+		-o $(BIN_DIR)/clipboard-server-linux \
+		./$(CMD_SERVER)
+	@ls -lh $(BIN_DIR)/clipboard-server-linux
+	@echo "$(GREEN)✓ Сервер для Linux собран: $(BIN_DIR)/clipboard-server-linux$(NC)"
+
+# Сервер для Windows (AMD64)
+server-windows: deps
+	@echo "$(YELLOW)Компиляция сервера для Windows (AMD64)...$(NC)"
+	@mkdir -p $(BIN_DIR)
+	GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build \
+		-ldflags="$(LDFLAGS)" \
+		-trimpath \
+		-o $(BIN_DIR)/clipboard-server-windows.exe \
+		./$(CMD_SERVER)
+	@ls -lh $(BIN_DIR)/clipboard-server-windows.exe
+	@echo "$(GREEN)✓ Сервер для Windows собран: $(BIN_DIR)/clipboard-server-windows.exe$(NC)"
 
 # Клиент для Windows (AMD64)
 client-windows: deps
