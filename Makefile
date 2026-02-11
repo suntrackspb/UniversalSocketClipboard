@@ -32,6 +32,9 @@ help:
 	@echo "  make client-macos-universal - Собрать универсальный клиент для macOS"
 	@echo "  make clean                - Удалить собранные бинарники"
 	@echo "  make test                 - Запустить тесты"
+	@echo "  make deploy-server        - Загрузить сервер на роутер OpenWRT"
+	@echo "  make deploy-server-linux  - Подготовить сервер для Linux (AMD64)"
+	@echo "  make deploy-server-windows - Подготовить сервер для Windows (AMD64)"
 	@echo ""
 
 deps:
@@ -180,6 +183,20 @@ deploy-server: server-openwrt
 	@ssh $(ROUTER_USER)@$(ROUTER_IP) "chmod +x /tmp/clipboard-server"
 	@echo "$(GREEN)✓ Сервер загружен на роутер$(NC)"
 	@echo "Для запуска: ssh $(ROUTER_USER)@$(ROUTER_IP) '/tmp/clipboard-server'"
+
+# Подготовка сервера для Linux (AMD64)
+deploy-server-linux: server-linux
+	@echo "$(YELLOW)Сервер для Linux готов: $(BIN_DIR)/clipboard-server-linux$(NC)"
+	@echo "Скопируйте его на свой сервер/NAS, например:"
+	@echo "  scp $(BIN_DIR)/clipboard-server-linux user@your-server:/usr/local/bin/clipboard-server"
+	@echo "  ssh user@your-server 'chmod +x /usr/local/bin/clipboard-server && /usr/local/bin/clipboard-server -addr :9090'"
+
+# Подготовка сервера для Windows (AMD64)
+deploy-server-windows: server-windows
+	@echo "$(YELLOW)Сервер для Windows готов: $(BIN_DIR)/clipboard-server-windows.exe$(NC)"
+	@echo "Скопируйте его на Windows-сервер, например через RDP/SMB,"
+	@echo "затем запустите в PowerShell или cmd:"
+	@echo "  clipboard-server-windows.exe -addr :9090"
 
 # Запуск сервера локально для тестирования
 run-server: local-server

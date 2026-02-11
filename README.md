@@ -4,7 +4,7 @@
 
 ## Русский
 
-Централизованный буфер обмена для локальной сети с роутером OpenWRT в качестве сервера.
+Universal Socket Clipboard — это централизованный буфер обмена для локальной сети с простым WebSocket‑сервером, который можно запустить на роутере OpenWRT, обычном Linux/Windows сервере или NAS.
 
 ### Возможности
 
@@ -15,13 +15,40 @@
 
 ### Установка
 
-**Сервер (OpenWRT):**
+**Сервер:**
 
-```bash
-# Скачать из Releases или собрать самостоятельно
-./build.sh
-./deploy.sh
-```
+- OpenWRT (роутер):
+
+  ```bash
+  # Скачать из Releases или собрать самостоятельно
+  ./build.sh
+  ./deploy.sh
+  ```
+
+- Linux / Windows (сервер, NAS, хост):
+
+  Соберите серверные бинарники:
+
+  ```bash
+  make server-linux    # Linux x64
+  make server-windows  # Windows x64
+  ```
+
+  Затем скопируйте и запустите бинарник на нужной машине:
+
+  - Linux:
+
+    ```bash
+    scp bin/clipboard-server-linux user@your-server:/usr/local/bin/clipboard-server
+    ssh user@your-server 'chmod +x /usr/local/bin/clipboard-server && clipboard-server -addr :9090'
+    ```
+
+  - Windows:
+
+    ```powershell
+    # Скопируйте bin/clipboard-server-windows.exe и запустите:
+    clipboard-server-windows.exe -addr :9090
+    ```
 
 **Клиент:**
 
@@ -59,7 +86,7 @@ MIT
 
 ## English
 
-A centralized clipboard for your local network, with an OpenWRT router as the server.
+Universal Socket Clipboard is a centralized clipboard for your local network powered by a simple WebSocket server that can run on an OpenWRT router, a regular Linux/Windows server, or a NAS.
 
 ### Features
 
@@ -70,13 +97,40 @@ A centralized clipboard for your local network, with an OpenWRT router as the se
 
 ### Installation
 
-**Server (OpenWRT):**
+**Server:**
 
-```bash
-# Download from Releases or build locally
-./build.sh
-./deploy.sh
-```
+- OpenWRT (router):
+
+  ```bash
+  # Download from Releases or build locally
+  ./build.sh
+  ./deploy.sh
+  ```
+
+- Linux / Windows (server, NAS, host):
+
+  Build server binaries:
+
+  ```bash
+  make server-linux    # Linux x64
+  make server-windows  # Windows x64
+  ```
+
+  Then copy and run the binary on your machine:
+
+  - Linux:
+
+    ```bash
+    scp bin/clipboard-server-linux user@your-server:/usr/local/bin/clipboard-server
+    ssh user@your-server 'chmod +x /usr/local/bin/clipboard-server && clipboard-server -addr :9090'
+    ```
+
+  - Windows:
+
+    ```powershell
+    # Copy bin/clipboard-server-windows.exe and run:
+    clipboard-server-windows.exe -addr :9090
+    ```
 
 **Client:**
 
