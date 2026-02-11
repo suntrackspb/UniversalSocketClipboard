@@ -15,50 +15,22 @@ Universal Socket Clipboard — это централизованный буфе�
 
 ### Установка
 
-**Сервер:**
+**Сервер:** Подробная установка и systemd-юнит — [INSTALL_SERVER.md](INSTALL_SERVER.md).
 
-- OpenWRT (роутер):
-
-  ```bash
-  # Скачать из Releases или собрать самостоятельно
-  ./build.sh
-  ./deploy.sh
-  ```
-
-- Linux / Windows (сервер, NAS, хост):
-
-  Соберите серверные бинарники:
-
-  ```bash
-  make server-linux    # Linux x64
-  make server-windows  # Windows x64
-  ```
-
-  Затем скопируйте и запустите бинарник на нужной машине:
-
-  - Linux:
-
-    ```bash
-    scp bin/clipboard-server-linux user@your-server:/usr/local/bin/clipboard-server
-    ssh user@your-server 'chmod +x /usr/local/bin/clipboard-server && clipboard-server -addr :9090'
-    ```
-
-  - Windows:
-
-    ```powershell
-    # Скопируйте bin/clipboard-server-windows.exe и запустите:
-    clipboard-server-windows.exe -addr :9090
-    ```
+- OpenWRT (роутер): `./build.sh` и `./deploy.sh`, либо ручная загрузка (см. INSTALL_SERVER.md).
+- Linux / Windows: соберите `make server-linux` или `make server-windows`, скопируйте бинарник и запустите `-addr :9090`; на Linux можно настроить systemd (пример юнита в INSTALL_SERVER.md).
 
 **Клиент:**
 
 ```bash
-# Windows
-clipboard-client-windows.exe -server ws://192.168.1.1:9090/ws
-
-# Linux / macOS
+# С указанием адреса в параметрах
 clipboard-client -server ws://192.168.1.1:9090/ws
+
+# Или без параметра — адрес берётся из конфиг-файла или значения по умолчанию
+clipboard-client
 ```
+
+Адрес сервера можно задать в конфиг-файле (см. [INSTALL_RU.md](INSTALL_RU.md)#конфигурационный-файл).
 
 Подробнее: [INSTALL_RU.md](INSTALL_RU.md) — установка и автозапуск клиента.
 
@@ -97,50 +69,22 @@ Universal Socket Clipboard is a centralized clipboard for your local network pow
 
 ### Installation
 
-**Server:**
+**Server:** Full installation and systemd unit — [INSTALL_SERVER.md](INSTALL_SERVER.md).
 
-- OpenWRT (router):
-
-  ```bash
-  # Download from Releases or build locally
-  ./build.sh
-  ./deploy.sh
-  ```
-
-- Linux / Windows (server, NAS, host):
-
-  Build server binaries:
-
-  ```bash
-  make server-linux    # Linux x64
-  make server-windows  # Windows x64
-  ```
-
-  Then copy and run the binary on your machine:
-
-  - Linux:
-
-    ```bash
-    scp bin/clipboard-server-linux user@your-server:/usr/local/bin/clipboard-server
-    ssh user@your-server 'chmod +x /usr/local/bin/clipboard-server && clipboard-server -addr :9090'
-    ```
-
-  - Windows:
-
-    ```powershell
-    # Copy bin/clipboard-server-windows.exe and run:
-    clipboard-server-windows.exe -addr :9090
-    ```
+- OpenWRT: `./build.sh` and `./deploy.sh`, or manual setup (see INSTALL_SERVER.md).
+- Linux / Windows: `make server-linux` or `make server-windows`, then copy and run with `-addr :9090`; on Linux you can use the systemd unit (example in INSTALL_SERVER.md).
 
 **Client:**
 
 ```bash
-# Windows
-clipboard-client-windows.exe -server ws://192.168.1.1:9090/ws
-
-# Linux / macOS
+# With server URL on the command line
 clipboard-client -server ws://192.168.1.1:9090/ws
+
+# Or without — URL is read from config file or default
+clipboard-client
 ```
+
+You can put the server URL in a config file (see [INSTALL_EN.md](INSTALL_EN.md)#configuration-file).
 
 See [INSTALL_EN.md](INSTALL_EN.md) for client installation and autostart.
 

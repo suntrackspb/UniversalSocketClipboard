@@ -2,6 +2,27 @@
 
 Instructions for installing the client as a system service so it starts automatically on boot or wake.
 
+## Configuration file
+
+You can omit the server URL from the command line and set it in a config file. If `-server` is not passed, the client looks for the config file and reads the URL from it; otherwise it uses the default `ws://192.168.1.1:9090/ws`.
+
+**Config file location by OS:**
+
+| OS      | Config file path |
+|---------|-------------------|
+| Linux   | `~/.config/clipboard-client/config` (or `$XDG_CONFIG_HOME/clipboard-client/config`) |
+| macOS   | `~/Library/Application Support/clipboard-client/config` |
+| Windows | `%APPDATA%\clipboard-client\config` (e.g. `C:\Users\<user>\AppData\Roaming\clipboard-client\config`) |
+
+**File format** — a single line with the `server=` key (lines starting with `#` are ignored):
+
+```
+# WebSocket server URL
+server=ws://192.168.1.1:9090/ws
+```
+
+The `-server` command-line flag overrides the config file.
+
 ## Linux (systemd)
 
 ### Automatic installation

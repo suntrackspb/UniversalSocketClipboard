@@ -13,8 +13,10 @@ import (
 	"github.com/denisuvarov/openwrt-clipboard/internal/protocol"
 )
 
+const defaultServerURL = "ws://192.168.1.1:9090/ws"
+
 var (
-	serverURL = flag.String("server", "ws://192.168.1.1:9090/ws", "WebSocket server URL")
+	serverURL = flag.String("server", "", "WebSocket server URL (overrides config file)")
 	clientID  = flag.String("id", "", "Client ID (auto-generated if empty)")
 	debug     = flag.Bool("debug", false, "Enable debug logging (connection errors, reconnects, etc.)")
 	version   = "dev" // Будет заменено при сборке через -ldflags
@@ -22,6 +24,18 @@ var (
 
 func main() {
 	flag.Parse()
+
+	// Адрес сервера: флаг > конфиг-файл > значение по умолчанию
+	if *serverURL == "" {
+		if url, ok := client.LoadServerURL(); ok {
+			*serverURL = url
+			if *debug {
+				log.Printf("Using server URL from config file")
+			}
+		} else {
+			*serverURL = defaultServerURL
+		}
+	}
 
 	log.Printf("OpenWRT Clipboard Client %s", version)
 
